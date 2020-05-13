@@ -1,4 +1,6 @@
-BASE_DIR=$(readlink -f $(dirname $0)/..)
+if [ -z ${BASE_DIR+x} ]; then 
+  BASE_DIR=$(readlink -f $(dirname $0))
+fi
 
 show_art() {
   title=$1
@@ -373,7 +375,7 @@ extensions_install() {
   sudo apt install -y -q meson
   pushd .
   cd $GNOME_DIR/extension-pack
-  meson builddir -Dprefix=/home/averissimo/.local
+  meson builddir -Dprefix=$HOME/.local
   cd builddir
   ninja install
   popd

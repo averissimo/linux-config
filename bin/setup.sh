@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_DIR=$(readlink -f $(dirname $0))
+BASE_DIR=$(readlink -f $(dirname $0)/..)
 echo "Installing config to $HOME"
 
 echo " note: going to try and source files instead of overriding"
