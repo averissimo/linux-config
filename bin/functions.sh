@@ -7,7 +7,7 @@ show_art() {
     echo "Needs to install figlet for fancy art"
     sudo apt install figlet -y
   fi
-  figlet $title
+  figlet -t $title
   echo
   if [ -n "$note" ]; then
     echo "  note:: $note"
@@ -141,6 +141,26 @@ ruby_install() {
   echo "      :: $(ruby -v)"
 }
 register+=(ruby_install)
+
+rstudio_install() {
+  show_art 'rstudio'
+
+  pushd .
+  cd $BASE_DIR
+  clone_url https://github.com/averissimo/rstudio-download rstudio-download
+  popd
+
+  source $HOME/.nvm/nvm.sh
+  
+  pushd .
+  cd $BASE_DIR/rstudio-download
+  nvm use node
+  npm i
+  npm start
+
+  popd
+}
+register+=(rstudio_install)
 
 #
 # nvm and rvm lazy loading
