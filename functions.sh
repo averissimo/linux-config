@@ -103,20 +103,32 @@ node_install() {
     popd
   else
     echo "ACTION:: Installing node..."
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | PROFILE=/dev/null bash
+    clone_url https://github.com/nvm-sh/nvm $HOME/.nvm
+    pushd .
+    cd $HOME/.nvm
+    git fetch --tags
+    TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+    echo "TAG is $TAG"
+    git checkout "$TAG"
+    popd
   fi
 
   echo
   echo "Sourcing nvm.sh"
-  source $HOME/.nvm/nvm.sh
+
+  NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
   echo
   echo "Installing latest node"
 
   nvm install node       # install latest stable version
-  nvm alias default node # default to latest version
-  npm i -g npm
-  npm i -g yarn
+  nvm ls --no-alias
+  nvm current
+  nvm alias default node
+
+  npm install -g npm
+  npm install -g yarn
 }
 register+=(node_install)
 
@@ -152,12 +164,14 @@ rstudio_install() {
   clone_url https://github.com/averissimo/rstudio-download rstudio-download
   popd
 
-  source $HOME/.nvm/nvm.sh
+  NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  
+  nvm install node
   
   pushd .
   cd $BASE_DIR/rstudio-download
-  nvm use node
-  npm i
+  npm install
   npm start
 
   popd
