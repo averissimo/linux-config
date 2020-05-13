@@ -1,0 +1,43 @@
+alias ".."="cd .."
+alias "..."="cd ../.."
+alias "...."="cd ../../.."
+
+alias "+"="pushd ."
+alias -- "-"=popd
+
+#alias ll="colorls -ln"
+
+#alias ls="colorls --color -h"
+#alias la="colorls --color -lna"
+
+complete -C /usr/share/ant/bin/complete-ant-cmd.pl ant build.sh
+
+
+# first line bash for environments that support git_ps1
+# second does not support (default)
+
+# git status * / + / % for tracking changes / staged / untracked files
+export GIT_PS1_SHOWDIRTYSTATE=true
+export GIT_PS1_SHOWUNTRACKEDFILES=true
+
+if [[ $HOSTNAME = 'decas' ]]; then
+  # personal
+  PS1='\e[0;35m[\u\e[m\e[0;35m@\h]\e[m > \e[0;32m[\w]\e[m \[\033[33m$(__git_ps1 "(%s)" )\033[0m\]\n$ '
+  #PS1='\e[0;35m[\u\e[m\e[0;35m@\h\e[m > \e[0;32m[\w]\e[m \[\033[33m\033[0m\]\n$ '	    
+elif [[ $HOSTNAME = 'server' || $HOSTNAME = 'aleph.inesc-id.pt' ]]; then
+  # oracle (red)
+  PS1='\e[0;35m[\u\e[m\e[0;31m@\h]\e[m > \e[0;32m[\w]\e[m \[\033[33m$(__git_ps1 "(%s)" ) \033[0m\]\n$ '
+  #PS1='\e[0;35m[\u\e[m\e[0;31m@\h\e[m > \e[0;32m[\w]\e[m \[\033[33m\033[0m\]\n$ '
+elif [[ $HOSTNAME = 'gimel.inesc-id.pt' ]]; then
+  # gimel (yellow)
+  #PS1='\e[0;35m[\u\e[m\e[0;33m@\h\e[m > \e[0;32m[\w]\e[m \[\033[33m$(__git_ps1 "(%s)" ) \033[0m\]\n$ '
+  PS1='\e[0;35m[\u\e[m\e[0;33m@\h]\e[m > \e[0;32m[\w]\e[m \[\033[33m\033[0m\]\n$ '
+elif [[ $HOSTNAME = 'raspbmc' ]]; then
+  # pi (blue)
+  #PS1='\e[0;35m[\u\e[m\e[0;36m@\h\e[m > \e[0;32m[\w]\e[m \[\033[33m$(__git_ps1 "(%s)" ) \033[0m\]\n$ '
+  PS1='\e[0;35m[\u\e[m\e[0;36m@\h]\e[m > \e[0;32m[\w]\e[m \[\033[33m\033[0m\]\n$ '
+else
+  PS1='\e[0;35m[\u\e[m\e[0;35m@\h]\e[m > \e[0;32m[\w]\e[m \[\033[33m\033[0m\]\n$ '
+fi
+
+unset command_not_found_handle

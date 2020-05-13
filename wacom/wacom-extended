@@ -1,0 +1,4 @@
+#!/bin/sh
+
+#Use monitor screen (super x)
+~/.xsetwacom.sh -e

@@ -1,0 +1,103 @@
+#!/bin/bash
+
+
+# name of devices
+PEN="Wacom Intuos PT S Pen stylus"
+ERASER="Wacom Intuos PT S Pen eraser"
+#
+PREFIX="xsetwacom --set"
+SUFFIX="MapToOutput"
+#
+SCREEN1="eDP-1"
+SCREEN2="HDMI-1"
+
+usage() {
+	echo ".xsetwacom [-h] [-c] [-s]"
+	echo " h: show this help"
+	echo " c: get compiz commands"
+	echo " s: set wacom shortcut buttons (same as with no parameters)"
+  #
+  echo " a: all screens"
+  echo " m: main screen"
+  echo " e: extended scree"
+}
+
+set_shortcuts() {
+	# 8 bottom rigth
+	# 9 top right
+	# 1 bottom left
+	# 3 top left
+	#
+  NAME="Wacom Intuos PT S Finger pad"
+  NAME="Wacom Intuos PT S Pad pad"
+	echo "Setting shortcuts to tablet..."
+	# super x: command 1 / DP2
+	xsetwacom --set "$NAME" Button 8 "key super x"
+	# super z: command 0 / eDP1
+	xsetwacom --set "$NAME" Button 1 "key super z"
+	# super b: desktop
+	xsetwacom --set "$NAME" Button 9 "key super b"
+}
+
+main() {
+  # super z
+	set_shortcuts
+  eval "$PREFIX \"$PEN\" $SUFFIX \"$SCREEN1\""
+  eval "$PREFIX \"$ERASER\" $SUFFIX \"$SCREEN1\""
+}
+
+extended() {
+  # super x
+	set_shortcuts
+  eval "$PREFIX \"$PEN\" $SUFFIX \"$SCREEN2\""
+  eval "$PREFIX \"$ERASER\" $SUFFIX \"$SCREEN2\""
+}
+
+all() {
+	# super b
+	set_shortcuts
+  eval "$PREFIX \"$PEN\" $SUFFIX \"desktop\""
+  eval "$PREFIX \"$ERASER\" $SUFFIX \"desktop\""
+}
+
+compiz() {
+
+	# laptop display (super x)
+	echo "Use laptop screen (super z)"
+	echo "~/.xsetwacom.sh && $PREFIX \"$PEN\" $SUFFIX \"$SCREEN1\" && $PREFIX \"$ERASER\" $SUFFIX \"$SCREEN1\""
+	# monitor display (super z)
+	echo "Use monitor screen (super x)"
+	echo "~/.xsetwacom.sh && $PREFIX \"$PEN\" $SUFFIX \"$SCREEN2\" && $PREFIX \"$ERASER\" $SUFFIX \"$SCREEN2\""
+	# all displays (super b)
+	echo "Use all monitors (super b)"
+	echo "~/.xsetwacom.sh && $PREFIX \"$PEN\" $SUFFIX \"desktop\" && $PREFIX \"$ERASER\" $SUFFIX \"desktop\""
+}
+
+if [[ $# -eq 0 ]];
+then
+	set_shortcuts
+	exit
+
+fi
+
+case "$1"
+in
+	-c) 
+		compiz
+		;;
+	-s) 
+		set_shortcuts
+		;;
+	-a) 
+		all
+		;;
+	-m) 
+		main
+		;;
+	-e) 
+		extended
+		;;
+	*) 
+		usage
+		;;
+esac

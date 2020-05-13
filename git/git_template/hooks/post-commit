@@ -1,0 +1,9 @@
+#!/bin/bash
+### lolcommits hook (begin) ###
+export LANG="en_GB.UTF-8"
+
+source $HOME/.rvm/scripts/rvm &> /dev/null
+rvm use default &> /dev/null
+
+lolcommits --capture --fork
+###  lolcommits hook (end)  ###

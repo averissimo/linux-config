@@ -1,0 +1,251 @@
+" This line should not be removed as it ensures that various options are
+" properly set to work with the Vim-related packages available in Debian.
+runtime! debian.vim
+
+
+" vim-plug plugin manager
+call plug#begin()
+
+" let Vundle manage Vundle, required
+Plug 'VundleVim/Vundle.vim'
+
+" Colorscheme
+"
+" https://github.com/morhetz/gruvbox
+Plug 'morhetz/gruvbox'
+
+" ??
+"
+" https://github.com/scrooloose/nerdcommenter
+Plug 'scrooloose/nerdcommenter'
+
+" :magit
+" C-c (to commit)
+"
+" https://github.com/jreybert/vimagit
+Plug 'jreybert/vimagit'
+
+" ??
+"
+" https://github.com/tpope/vim-bundler 
+Plug 'tpope/vim-bundler'
+
+" gc (go comment)
+"
+" https://github.com/tpope/vim-commentary
+Plug 'tpope/vim-commentary'
+
+" ??
+"
+" https://github.com/tpope/vim-rails
+Plug 'tpope/vim-rails'
+
+" allow for . to be used by other plugins, such as surround
+"
+" https://github.com/tpope/vim-repeat
+Plug 'tpope/vim-repeat'
+
+" cs - change surrounding
+" ys - add surroundings
+" ds - delete surroundings
+"
+" https://github.com/tpope/vim-surround
+Plug 'tpope/vim-surround'
+
+" cp - copy system
+" 
+" https://github.com/christoomey/vim-system-copy
+Plug 'christoomey/vim-system-copy'
+
+
+" https://github.com/vim-airline/vim-airline
+Plug 'vim-airline/vim-airline'
+
+" https://github.com/vim-airline/vim-airline-themes
+Plug 'vim-airline/vim-airline-themes'
+
+Plug 'powerline/powerline'
+
+" add i as noun (such as w for word, s for sentence, p for paragraph)
+"
+Plug 'michaeljsmith/vim-indent-object'
+
+" requirement for kana-textobj-*
+Plug 'kana/vim-textobj-user'
+
+" at - an entire thing -- noun for whole document
+"
+Plug 'kana/vim-textobj-entire'
+
+" il - inner line -- noun for line excluding the prefixed spaces
+"
+Plug 'kana/vim-textobj-line'
+
+" Press C-p to preview
+" 
+Plug 'JamshedVesuna/vim-markdown-preview'
+
+" Markdown preview on browser
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
+
+" Fuzzy search
+Plug 'BurntSushi/ripgrep'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+
+" File browser
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+
+Plug 'airblade/vim-gitgutter'
+
+Plug 'fadein/vim-FIGlet'
+
+call plug#end()            " required
+
+" All system-wide defaults are set in $VIMRUNTIME/debian.vim (usually just
+" /usr/share/vim/vimcurrent/debian.vim) and sourced by the call to :runtime
+" you can find below.  If you wish to change any of those settings, you should
+" do it in this file (/etc/vim/vimrc), since debian.vim will be overwritten
+" everytime an upgrade of the vim packages is performed.  It is recommended to
+" make changes after sourcing debian.vim since it alters the value of the
+" 'compatible' option.
+
+" Source a global configuration file if available
+if filereadable("/etc/vim/vimrc.local")
+  source /etc/vim/vimrc.local
+endif
+
+
+" Uncomment the next line to make Vim more Vi-compatible
+" NOTE: debian.vim sets 'nocompatible'.  Setting 'compatible' changes numerous
+" options, so any other options should be set AFTER setting 'compatible'.
+"set compatible
+
+
+" Vim5 and later versions support syntax highlighting. Uncommenting the next
+" line enables syntax highlighting by default.
+if has("syntax")
+  syntax on
+endif
+
+" If using a dark background within the editing area and syntax highlighting
+" turn on this option as well
+" set background=dark
+
+" Uncomment the following to have Vim jump to the last position when
+" reopening a file
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
+" Uncomment the following to have Vim load indentation rules and plugins
+" according to the detected filetype.
+if has("autocmd")
+  filetype plugin indent on
+endif
+
+" The following are commented out as they cause vim to behave a lot
+" differently from regular Vi. They are highly recommended though.
+set showcmd            " Show (partial) command in status line.
+set showmatch          " Show matching brackets.
+set ignorecase         " Do case insensitive matching
+set smartcase          " Do smart case matching
+set incsearch          " Incremental search
+set autowrite          " Automatically save before commands like :next and :make
+set hidden             " Hide buffers when they are abandoned
+set mouse=a            " Enable mouse usage (all modes)
+set smartindent
+set autoindent
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
+set expandtab
+
+set number
+set relativenumber
+
+python3 from powerline.vim import setup as powerline_setup
+python3 powerline_setup()
+python3 del powerline_setup
+set laststatus=2 " Always display the statusline in all windows
+set showtabline=2 " Always display the tabline, even if there is only one tab
+set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+set t_Co=256
+
+colorscheme gruvbox
+set background=dark    " Setting dark mode
+
+set number
+set relativenumber
+
+nnoremap <C-k> :bnext<CR>
+nnoremap <C-j> :bprevious<CR>
+nnoremap <C-b> :ls<CR>:b<Space>
+
+" How can I open a NERDTree automatically when vim starts up if no files were specified?
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+" How can I open NERDTree automatically when vim starts up on opening a directory?
+
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
+
+" How can I close vim if the only window left open is a NERDTree?
+
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+
+" How can I map a specific key or shortcut to open NERDTree?
+map <C-\> :NERDTreeToggle<CR>
+
+nnoremap <C-p> :Files<CR>
+nnoremap <C-f> :Rg<CR>
+
+" Update sign column every quarter second
+set updatetime=250
+
+" Use fontawesome icons as signs
+let g:gitgutter_sign_added = ''
+let g:gitgutter_sign_modified = ''
+let g:gitgutter_sign_removed = ''
+let g:gitgutter_sign_removed_first_line = ''
+let g:gitgutter_sign_modified_removed = ''
+
+let g:gitgutter_override_sign_column_highlight = 1
+highlight SignColumn guibg=bg
+highlight SignColumn ctermbg=bg
+
+
+" Jump between hunks
+nmap <Leader>gn <Plug>(GitGutterNextHunk)  " git next
+nmap <Leader>gp <Plug>(GitGutterPrevHunk)  " git previous
+
+" Hunk-add and hunk-revert for chunk staging
+nmap <Leader>ga <Plug>GitGutterStageHunk  " git add (chunk)
+nmap <Leader>gu <Plug>GitGutterUndoHunk   " git undo (chunk)
+
+" Open vimagit pane
+nnoremap <leader>gs :Magit<CR>       " git status
+
+" Enable deletion of untracked files in Magit
+let g:magit_discard_untracked_do_delete=1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+count=$(ps -aux | grep -v grep | grep -v kill_vlc | grep vlc | wc -l)
+
+echo "Processes ($count)"
+ps -e | grep -v grep | grep -v kill_vlc|  grep vlc
+
+if (( $count > 0 )); then
+  echo ""
+  echo "  Kiling them..."
+  ps -e | grep -v grep | grep -v kill_vlc | grep vlc | awk '{print $2}' | xargs kill -9
+else
+  echo "  Nothing to kill. Exiting..."
+fi

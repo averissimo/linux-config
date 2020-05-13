@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Use all monitors (super b)
+~/.xsetwacom.sh -a

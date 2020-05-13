@@ -1,0 +1,26 @@
+[Desktop Entry]
+Version=1.0
+Name=Firefox Nightly Web Browser
+Comment=Browse the World Wide Web
+GenericName=Web Browser
+Keywords=Internet;WWW;Browser;Web;Explorer
+Exec=/opt/firefox-nightly/firefox --class Nightly %u
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+# Could also be absolute path
+Icon=firefox-nightly
+Categories=GNOME;GTK;Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;x-scheme-handler/chrome;video/webm;application/x-xpinstall;
+StartupNotify=true
+Actions=NewWindow;NewPrivateWindow;
+
+[Desktop Action NewWindow]
+Name=Open a New Window
+Exec=/opt/firefox-nightly/firefox -new-window --class Nightly
+OnlyShowIn=Unity;
+
+[Desktop Action NewPrivateWindow]
+Name=Open a New Private Window
+Exec=/opt/firefox-nightly/firefox -private-window --class Nightly
+OnlyShowIn=Unity;

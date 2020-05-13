@@ -1,0 +1,97 @@
+#!/bin/bash
+
+function print_help {
+  echo "Convert movie to gif using an optimized palette"
+  echo ""
+  echo "usage: convert_to_gif [options] <input file>"
+  echo ""
+  echo "  options:"
+  echo "    -o|--output: output file"
+  echo "    -w|--width:  width of output movie"
+  echo "    -f|--fps:    frames per second"
+  echo "    -ss:         skip initial time in seconds or HH:MM:SS"
+}
+
+# default options
+outputFile=/tmp/outputXXXXXXXX.gif
+FPS=15
+WIDTH=-1
+SKIP=00:00:00
+
+while [[ $# -gt 0 ]]
+do
+	key="$1"
+	case $key in
+		  -f|--fps)
+		  FPS="$2"
+		  shift # past argument
+		  ;;
+		  -w|--width)
+		  WIDTH="$2"
+		  shift # past argument
+		  ;;
+		  -o|--output)
+		  outputFile="$2"
+		  shift # past argument
+		  ;;
+		  -ss)
+		  SKIP="$2"
+		  shift # past argument
+		  ;;
+		  -h|--help)
+			print_help
+		  exit
+		  ;;
+		  *)
+		  if [[ $key == -* ]]; then
+		  	echo -e "\033[31mError:\e[0m Unkown option \"$key\""
+		  	echo ""
+		  	print_help
+		  	exit
+	  	fi
+		  if [ -z ${inputFile+x} ]; then
+			  inputFile=$key      # unknown option
+		  else
+		  	echo -e "\033[31mError:\e[0m Can only define one input file."
+		  	echo ""
+		  	print_help
+		  	exit
+		  fi
+		  ;;
+	esac
+	shift # past argument or value
+done	
+
+if [ -z ${inputFile+x} ]; then
+	echo -e "\033[31mError:\e[0m An <input file> must be defined."
+	echo ""
+	print_help
+	exit
+fi
+
+if [ ! -f ${inputFile} ]; then
+	echo -e "\033[31mError:\e[0m <input file> does not exist."
+	echo ""
+	print_help
+	exit
+fi
+
+	
+echo "Options defined:"
+echo "  input: $inputFile"
+echo "  output: $outputFile"
+echo "  skip initial: $SKIP"
+echo "  width: $WIDTH"
+echo "  FPS: $FPS"
+echo "-------------"
+
+PALETTE=/tmp/tmp_palette.png
+
+#Generate palette for better quality
+ffmpeg -i $inputFile -vf fps=$FPS,scale=$WIDTH:-1:flags=lanczos,palettegen $PALETTE
+
+#Generate gif using palette
+ffmpeg -ss $SKIP -i $inputFile -i $PALETTE -loop 0 -filter_complex "fps=$FPS,scale=$WIDTH:-1:flags=lanczos[x];[x][1:v]paletteuse" $outputFile
+
+rm $PALETTE
+

@@ -1,0 +1,8 @@
+# copy this file to ~/.gitconfig and change email
+[user]
+	name = André Veríssimo
+	email = afsverissimo@gmail.com
+[include]
+	path = ~/work/config-files/gitconfig.global
+[push]
+	default = simple
