@@ -96,6 +96,7 @@ node_install() {
     cd $HOME/.nvm
     git fetch --tags
     TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+    echo "TAG is $TAG"
     git checkout "$TAG"
     popd
   else
@@ -103,7 +104,9 @@ node_install() {
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.1/install.sh | PROFILE=/dev/null bash
   fi
 
-  source ~/.nvm/nvm.sh
+  echo
+  echo "Sourcing nvm.sh"
+  source $HOME/.nvm/nvm.sh
 
   echo
   echo "Installing latest node"
@@ -211,7 +214,7 @@ vim_install() {
   sudo apt install -y powerline
 
   # Updating vim-plug
-  curl -sfLo ~/.vim/autoload/plug.vim --create-dirs \
+  curl -sfLo $HOME/.vim/autoload/plug.vim --create-dirs \
       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
   # vim configuration
@@ -368,7 +371,7 @@ gnome_install() {
   gsettings set org.gnome.desktop.interface gtk-theme 'Arc-Dark'
   gsettings set org.gnome.desktop.interface cursor-theme 'Bibata_Amber'
   gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
-  gsettings --schemadir ~/.local/share/gnome-shell/extensions/user-theme@gnome-shell-extensions.gcampax.github.com/schemas set org.gnome.shell.extensions.user-theme name "Arc-Dark"
+  gsettings --schemadir $HOME/.local/share/gnome-shell/extensions/user-theme@gnome-shell-extensions.gcampax.github.com/schemas set org.gnome.shell.extensions.user-theme name "Arc-Dark"
  }
 register+=(gnome_install)
 
