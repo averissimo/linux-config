@@ -1,12 +1,13 @@
 #!/bin/bash
 
+BASE_DIR=$(readlink -f $(dirname $0))
 echo "Installing config to $HOME"
 
 echo " note: going to try and source files instead of overriding"
 echo
 echo
 
-source functions.sh
+source $BASE_DIR/functions.sh
 
 string=$@
 

@@ -1,3 +1,5 @@
+BASE_DIR=$(readlink -f $(dirname $0)/..)
+
 show_art() {
   title=$1
   note=$2
@@ -53,7 +55,7 @@ git_install() {
   fi
 
   if ! git config include.path >/dev/null 2>&1; then
-    git config --global include.path $(pwd)/git/gitconfig.global
+    git config --global include.path $BASE_DIR/git/gitconfig.global
     echo "INFO:: Going to set $(git config --global include.path) as include.path"
   fi
 }
@@ -76,7 +78,7 @@ zsh_install() {
 
   if ! grep -q 'custom zshrc installed via config files' $HOME/.zshrc; then
     echo "ACTION:: writting to $HOME/.zshrc"
-    echo "[ -f $(pwd)/rc/zshrc ] && . $(pwd)/rc/zshrc # custom zshrc installed via config files" >> $HOME/.zshrc
+    echo "[ -f $BASE_DIR/rc/zshrc ] && . $BASE_DIR/rc/zshrc # custom zshrc installed via config files" >> $HOME/.zshrc
   else
     echo "INFO:: $HOME/.zshrc already been patched."
   fi
@@ -128,10 +130,12 @@ ruby_install() {
   fi
 
   source $HOME/.rvm/scripts/rvm
+  rvm cleanup all
 
   echo "ACTION:: Installing latest ruby..."
-  rvm install ruby
-  rvm use ruby --default
+  rvm install --quiet-curl ruby
+  rvm use --default ruby
+  echo "      :: $(ruby -v)"
 }
 register+=(ruby_install)
 
@@ -139,9 +143,10 @@ register+=(ruby_install)
 # nvm and rvm lazy loading
 lazy_load_install() {
   show_art 'lazy_load'
-  if ! grep -q 'lazy_load installed via config files' $HOME/.zshrc; then
+  lazy_load_str='lazy_load installed via linux-config'
+  if ! grep -q "$lazy_load_str" $HOME/.zshrc; then
     echo "ACTION:: writting to $HOME/.zshrc"
-    echo "[ -s $(pwd)/lazy_load.zsh ] && . $(pwd)/lazy_load.zsh    # lazy_load installed via config-files" >> $HOME/.zshrc
+    echo "[ -s $BASE_DIR/rc/lazy_load.zsh ] && . $BASE_DIR/rc/lazy_load.zsh    # $lazy_load_str" >> $HOME/.zshrc
   else
     echo "INFO:: $HOME/.zshrc already been patched."
   fi
@@ -155,7 +160,7 @@ bibata_install() {
   show_art 'bibata cursor'
 
   pushd .
-  cd shell_extensions
+  cd $BASE_DIR/shell_extensions
   
   clone_url https://github.com/KaizIqbal/Bibata_Cursor bibata
   
@@ -173,7 +178,7 @@ inputrc_install() {
   # inputrc configuration
   if ! test -f $HOME/.inputrc ; then
     echo "      :: writting to $HOME/.inputrc"
-    ln -s $(pwd)/rc/inputrc $HOME/.inputrc
+    ln -sf $BASE_DIR/rc/inputrc $HOME/.inputrc
   else
     echo "      :: $HOME/.inputrc already exists."
   fi
@@ -189,7 +194,7 @@ aria2c_install() {
   # aria2c configuration
   if ! test -f $HOME/.aria2c.conf ; then
     echo "      :: writting to $HOME/.aria2c.conf"
-    ln -s $(pwd)/rc/aria2c.conf $HOME/.aria2c.conf
+    ln -s $BASE_DIR/rc/aria2c.conf $HOME/.aria2c.conf
   else
     echo "      :: $HOME/.aria2c.conf already exists."
   fi
@@ -212,7 +217,7 @@ vim_install() {
   # vim configuration
   if ! test -f $HOME/.vimrc ||  ! grep -q 'installed via config-files' $HOME/.vimrc; then
     echo "      :: writting to $HOME/.vimrc"
-    echo "so $(pwd)/rc/vimrc   \" installed via config-files" >> $HOME/.vimrc
+    echo "so $BASE_DIR/rc/vimrc   \" installed via config-files" >> $HOME/.vimrc
   else
     echo "      :: $HOME/.vimrc already been patched."
   fi
@@ -225,17 +230,22 @@ register+=(vim_install)
 #
 lolcommits_install() {
   show_art 'lolcommits'
+  sudo apt install -y -q mplayer
+  rvm use default
   if [ -f $HOME/.rvm/gems/default/bin/lolcommits ]; then
-    gem update --user-install --no-ri lolcommits
+    gem update --user-install --no-document lolcommits
   else
+    echo
     read -p "Install lolcommits to take pictures? y/n (requires ruby): " -n 1 -r
     echo    # (optional) move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
-      gem install --user-install --no-ri lolcommits
+      gem install --user-install --no-document lolcommits
       mkdir -p $HOME/.git_template/hooks
       git config init.templatedir = $HOME/.git_template
-      ln -s $(pwd)/git/git_template/hooks/post-commit $HOME/.git_tempate/hooks/post-commit
+      if [ ! -f $HOME/.git_template/hooks/post-commit ]; then
+        ln -s $BASE_DIR/git/git_template/hooks/post-commit $HOME/.git_template/hooks/post-commit
+      fi
     fi
   fi
 }
@@ -245,7 +255,7 @@ themes_install() {
   show_art 'gnome themes'
   sudo apt install arc-theme papirus-icon-theme -y -q
 }
-register+=(themes_install)
+# register+=(themes_install)
 
 terminal_install() {
   show_art 'terminal (tilix)'
@@ -274,23 +284,26 @@ extensions_install() {
   
   show_art "gnome extensions"
   mkdir -p $HOME/.local/share/gnome-shell/extensions
-  mkdir -p shell_extensions
+  mkdir -p $BASE_DIR/shell_extensions
   pushd .
-  cd shell_extensions
+  GNOME_DIR=$BASE_DIR/shell_extensions
+
+  cd $GNOME_DIR
 
   show_art "download extensions"
   clone_url https://github.com/micheleg/dash-to-dock.git dash-to-dock
   clone_url https://github.com/kazysmaster/gnome-shell-extension-lockkeys lockkeys
   clone_url https://gitlab.com/jenslody/gnome-shell-extension-openweather.git  openweather
   clone_url https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet monitor-applet
-  
+  clone_url https://github.com/eonpatapon/gnome-shell-extension-caffeine caffeine
+
   # many here
   clone_url https://gitlab.gnome.org/GNOME/gnome-shell-extensions extension-pack
 
   # Caffeine
   show_art "Caffeine"
   pushd .
-  cd caffeine
+  cd $GNOME_DIR/caffeine
   ./update-locale.sh
   glib-compile-schemas --strict --targetdir=caffeine@patapon.info/schemas/ caffeine@patapon.info/schemas
   cp -r caffeine@patapon.info $HOME/.local/share/gnome-shell/extensions
@@ -303,7 +316,7 @@ extensions_install() {
   # dash-to-dock
   show_art "dash-to-dock"
   pushd .
-  cd dash-to-dock
+  cd $GNOME_DIR/dash-to-dock
   make
   make install
   popd
@@ -311,7 +324,7 @@ extensions_install() {
   # lock keys
   show_art "lock keys"
   pushd .
-  cd lockkeys
+  cd $GNOME_DIR/lockkeys
   cp -r lockkeys@vaina.lt $HOME/.local/share/gnome-shell/extensions
   popd
 
@@ -319,31 +332,31 @@ extensions_install() {
   show_art "monitor"
   sudo apt-get install -y gir1.2-gtop-2.0 gir1.2-nm-1.0  gir1.2-clutter-1.0
   pushd .
-  cd monitor-applet
+  cd $GNOME_DIR/monitor-applet
   make install
   popd
 
   # openweather
   show_art "open weather"
-  sudo apt install -y gnome-common
+  sudo apt install -y -q gnome-common
   pushd .
-  cd openweather
+  cd $GNOME_DIR/openweather
   ./autogen.sh
   make local-install
   popd
   
   # pack
   show_art "Extension pack (user-theme)"
-  sudo apt install -y meson
+  sudo apt install -y -q meson
   pushd .
-  cd extension-pack
+  cd $GNOME_DIR/extension-pack
   meson builddir -Dprefix=/home/averissimo/.local
   cd builddir
   ninja install
   popd
   
 
-  sudo apt install -y libgtk-3-dev
+  sudo apt install -y -q libgtk-3-dev
 # end
   popd
 }
@@ -361,12 +374,12 @@ register+=(gnome_install)
 
 fonts_install() {
   mkdir -p $HOME/.local/share/fonts
-  cp -r fonts/* $HOME/.local/share/fonts/
+  cp -r $BASE_DIR/fonts/* $HOME/.local/share/fonts/
 }
 register+=(fonts_install)
 
 deb_install() {
-  sudo apt install -y flameshot filezilla peek
+  sudo apt install -y -q flameshot filezilla peek
 }
 register+=(deb_install)
 
