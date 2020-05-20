@@ -12,15 +12,13 @@ source $BASE_DIR/functions.sh
 string=$@
 
 if [ -z "$@" ];then
-  all_install
+  all_install | sed -E 's/^(.)/    \1/g'
 else
-  set -f                      # avoid globbing (expansion of *).
+  #set -f                      # avoid globbing (expansion of *).
   array=(${string//:/ })
 
   for item in ${array[*]}
   do
-    eval ${item}_install
+    eval "${item}_install"
   done
 fi
-
-

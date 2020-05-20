@@ -1,6 +1,11 @@
-if [ -z ${BASE_DIR+x} ]; then 
+if [ -z ${BASE_DIR+x} ]; then
   BASE_DIR=$(readlink -f $(dirname $0))
 fi
+
+do_nothing() {
+  echo "Starting all run"
+}
+declare -a register=(do_nothing)
 
 show_art() {
   title=$1
@@ -9,7 +14,7 @@ show_art() {
     echo "Needs to install figlet for fancy art"
     sudo apt install figlet -y
   fi
-  figlet -t $title
+  figlet -t $title | sed -E 's/^(.)/    \1/g'
   echo
   if [ -n "$note" ]; then
     echo "  note:: $note"
@@ -19,7 +24,7 @@ show_art() {
 
 #
 # aria2c config
-# 
+#
 firefox_install() {
   show_art 'firefox'
   echo "ACTION:: installing firefox"
@@ -32,10 +37,11 @@ firefox_install() {
     echo "      :: /opt/firefox already exists."
   fi
 }
+register+=(firefox_install)
 
 #
 # git
-# 
+#
 git_install() {
   show_art 'git'
   if git config user.email >/dev/null 2>&1; then
@@ -61,7 +67,7 @@ git_install() {
     echo "INFO:: Going to set $(git config --global include.path) as include.path"
   fi
 }
-declare -a register=(git_install)
+register+=(git_install)
 
 #
 # zsh
@@ -94,23 +100,23 @@ node_install() {
   show_art 'node'
   if [ -d $HOME/.nvm ]; then
     echo "ACTION:: Updating node..."
-    pushd .
+    pushd . > /dev/null
     cd $HOME/.nvm
     git fetch --tags
     TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
     echo "TAG is $TAG"
     git checkout "$TAG"
-    popd
+    popd > /dev/null
   else
     echo "ACTION:: Installing node..."
     clone_url https://github.com/nvm-sh/nvm $HOME/.nvm
-    pushd .
+    pushd . > /dev/null
     cd $HOME/.nvm
     git fetch --tags
     TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
     echo "TAG is $TAG"
     git checkout "$TAG"
-    popd
+    popd > /dev/null
   fi
 
   echo
@@ -159,22 +165,22 @@ register+=(ruby_install)
 rstudio_install() {
   show_art 'rstudio'
 
-  pushd .
+  pushd . > /dev/null
   cd $BASE_DIR
   clone_url https://github.com/averissimo/rstudio-download rstudio-download
-  popd
+  popd > /dev/null
 
   NVM_DIR="$HOME/.nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-  
+
   nvm install node
-  
-  pushd .
+
+  pushd . > /dev/null
   cd $BASE_DIR/rstudio-download
   npm install
   npm start
 
-  popd
+  popd > /dev/null
 }
 register+=(rstudio_install)
 
@@ -198,19 +204,19 @@ register+=(lazy_load_install)
 bibata_install() {
   show_art 'bibata cursor'
 
-  pushd .
+  pushd . > /dev/null
   cd $BASE_DIR/shell_extensions
-  
+
   clone_url https://github.com/KaizIqbal/Bibata_Cursor bibata
-  
+
   cd bibata
   ./install.sh
-  popd
+  popd > /dev/null
 }
 
 #
 # inputrc config
-# 
+#
 inputrc_install() {
   show_art 'inputrc'
   echo "ACTION:: updating inputrc"
@@ -226,7 +232,7 @@ register+=(inputrc_install)
 
 #
 # aria2c config
-# 
+#
 aria2c_install() {
   show_art 'aria2c'
   echo "ACTION:: updating aria2c configuration"
@@ -242,7 +248,7 @@ register+=(aria2c_install)
 
 #
 # VIM
-# 
+#
 vim_install() {
   show_art 'vim'
   echo "ACTION:: Updating vim-plug"
@@ -304,10 +310,10 @@ register+=(terminal_install)
 
 clone_url() {
   if [ -d $(pwd)/$2 ]; then
-    pushd .
+    pushd . > /dev/null
     cd $(pwd)/$2
     git pull
-    popd
+    popd > /dev/null
   else
     git clone \
       -c core.eol=lf \
@@ -320,11 +326,11 @@ clone_url() {
 }
 
 extensions_install() {
-  
+
   show_art "gnome extensions"
   mkdir -p $HOME/.local/share/gnome-shell/extensions
   mkdir -p $BASE_DIR/shell_extensions
-  pushd .
+  pushd . > /dev/null
   GNOME_DIR=$BASE_DIR/shell_extensions
 
   cd $GNOME_DIR
@@ -341,12 +347,12 @@ extensions_install() {
 
   # Caffeine
   show_art "Caffeine"
-  pushd .
+  pushd . > /dev/null
   cd $GNOME_DIR/caffeine
   ./update-locale.sh
   glib-compile-schemas --strict --targetdir=caffeine@patapon.info/schemas/ caffeine@patapon.info/schemas
   cp -r caffeine@patapon.info $HOME/.local/share/gnome-shell/extensions
-  popd
+  popd > /dev/null
 
   # cpufreq
   show_art "cpufreq"
@@ -354,50 +360,50 @@ extensions_install() {
 
   # dash-to-dock
   show_art "dash-to-dock"
-  pushd .
+  pushd . > /dev/null
   cd $GNOME_DIR/dash-to-dock
   make
   make install
-  popd
+  popd > /dev/null
 
   # lock keys
   show_art "lock keys"
-  pushd .
+  pushd . > /dev/null
   cd $GNOME_DIR/lockkeys
   cp -r lockkeys@vaina.lt $HOME/.local/share/gnome-shell/extensions
-  popd
+  popd > /dev/null
 
   # monitor applet
   show_art "monitor"
   sudo apt-get install -y gir1.2-gtop-2.0 gir1.2-nm-1.0  gir1.2-clutter-1.0
-  pushd .
+  pushd . > /dev/null
   cd $GNOME_DIR/monitor-applet
   make install
-  popd
+  popd > /dev/null
 
   # openweather
   show_art "open weather"
   sudo apt install -y -q gnome-common
-  pushd .
+  pushd . > /dev/null
   cd $GNOME_DIR/openweather
   ./autogen.sh
   make local-install
-  popd
-  
+  popd > /dev/null
+
   # pack
   show_art "Extension pack (user-theme)"
   sudo apt install -y -q meson
-  pushd .
+  pushd . > /dev/null
   cd $GNOME_DIR/extension-pack
   meson builddir -Dprefix=$HOME/.local
   cd builddir
   ninja install
-  popd
-  
+  popd > /dev/null
+
 
   sudo apt install -y -q libgtk-3-dev
 # end
-  popd
+  popd > /dev/null
 }
 register+=(extensions_install)
 
@@ -428,18 +434,3 @@ all_install() {
     eval ${item}
   done
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
