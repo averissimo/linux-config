@@ -79,7 +79,7 @@ zsh_install() {
     sudo apt install zsh -y
   fi
   if [ -d $HOME/.oh-my-zsh ]; then
-    zsh $HOME/.oh-my-zsh/tools/upgrade.sh
+    bash $HOME/.oh-my-zsh/tools/upgrade.sh
   else
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   fi
