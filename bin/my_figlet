@@ -5,7 +5,7 @@ if [ ! -x $(which figlet) ] ; then
   echo "error: figlet is not installed"
 fi
 
-comment="\#"
+comment="#"
 while getopts ":c:" opt; do
   case $opt in
     c) comment="$OPTARG"
@@ -27,25 +27,21 @@ repl() { printf "$1"'%.s' $(eval "echo {1.."$(($2))"}"); }
 
 size=$(echo -n $2 | wc -m)
 
-minSize=40
-if (( $size < $minSize )) ; then
-  size=$minSize
-fi
-
 cmd="figlet -t $str -f $font | sed -E \"s/^(.)/$comment  \1/g\""
 
-size=$(bash -c "$cmd" | xargs -I {} bash -c "echo '{}' | wc -m" | sort -h | tail -n 1)
+size=$(bash -c "$cmd" | wc -L)
 
 if (( $size > 80 )) ; then
   font=big
-  size=$(bash -c "$cmd" | xargs -I {} bash -c "echo '{}' | wc -m" | sort -h | tail -n 1)
   cmd="figlet -t $str -f $font | sed -E \"s/^(.)/$comment  \1/g\""
+  size=$(bash -c "$cmd" | wc -L)
 fi
 
 repl $comment $size
 echo "$comment"
 echo "$comment"
 bash -c "$cmd"
+echo "$comment"
 echo "$comment  $str"
 repl $comment $size
 echo
