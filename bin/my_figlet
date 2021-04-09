@@ -38,12 +38,15 @@ if (( $size > 80 )) ; then
 fi
 
 size_rep=$(($size / $size_comment))
+size_rep=$((size_rep - 1))
 
+echo -n "$comment "
 repl $comment $size_rep
 echo -e "$comment"
 echo -e       "$comment"
 bash -c "$cmd"
 echo "$comment"
 echo "$comment  $str"
+echo -n "$comment "
 repl $comment $size_rep
 echo
