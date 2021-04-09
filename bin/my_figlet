@@ -17,6 +17,8 @@ done
 shift $((OPTIND-1))
 str=$@
 
+comment_sed=$(echo $comment | sed -e 's/./\\&/g; 1{$s/^$/""/}; 1!s/^/"/; $!s/$/"/')
+
 font=big
 if test -f $HOME/.local/share/figlet/starwars.flf; then
   font="starwars -d ~/.local/share/figlet"
@@ -24,24 +26,24 @@ fi
 
 repl() { printf "$1"'%.s' $(eval "echo {1.."$(($2))"}"); }
 
+cmd="figlet -t $str -f $font | sed -E \"s/^(.)/$comment_sed  \1/g\""
 
-size=$(echo -n $2 | wc -m)
-
-cmd="figlet -t $str -f $font | sed -E \"s/^(.)/$comment  \1/g\""
-
+size_comment=$(echo $comment | wc -L)
 size=$(bash -c "$cmd" | wc -L)
 
 if (( $size > 80 )) ; then
   font=big
-  cmd="figlet -t $str -f $font | sed -E \"s/^(.)/$comment  \1/g\""
+  cmd="figlet -t $str -f $font | sed -E \"s/^(.)/$comment_sed  \1/g\""
   size=$(bash -c "$cmd" | wc -L)
 fi
 
-repl $comment $size
-echo "$comment"
-echo "$comment"
+size_rep=$(($size / $size_comment))
+
+repl $comment $size_rep
+echo -e "$comment"
+echo -e       "$comment"
 bash -c "$cmd"
 echo "$comment"
 echo "$comment  $str"
-repl $comment $size
+repl $comment $size_rep
 echo
