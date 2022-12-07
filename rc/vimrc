@@ -59,12 +59,9 @@ Plug 'christoomey/vim-system-copy'
 
 
 " https://github.com/vim-airline/vim-airline
-Plug 'vim-airline/vim-airline'
 
 " https://github.com/vim-airline/vim-airline-themes
-Plug 'vim-airline/vim-airline-themes'
 
-Plug 'powerline/powerline'
 
 " add i as noun (such as w for word, s for sentence, p for paragraph)
 "
@@ -165,9 +162,6 @@ set expandtab
 set number
 set relativenumber
 
-python3 from powerline.vim import setup as powerline_setup
-python3 powerline_setup()
-python3 del powerline_setup
 set laststatus=2 " Always display the statusline in all windows
 set showtabline=2 " Always display the tabline, even if there is only one tab
 set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
