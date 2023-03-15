@@ -38,8 +38,8 @@ group_lazy_load() {
 # Node
 declare -a NODE_GLOBALS=(`find ~/.nvm/versions/node -maxdepth 3 -type l -wholename '*/bin/*' | xargs -n1 basename | sort | uniq`)
 
-NODE_GLOBALS+=("node")
-NODE_GLOBALS+=("nvm")
+#NODE_GLOBALS+=("node")
+#NODE_GLOBALS+=("nvm")
 
 export NVM_DIR=~/.nvm
 group_lazy_load $HOME/.nvm/nvm.sh node nvm npm

@@ -5,10 +5,17 @@ if [ ! -x $(which figlet) ] ; then
   echo "error: figlet is not installed"
 fi
 
+max_width=80
 comment="#"
-while getopts ":c:" opt; do
+other="#"
+
+while getopts ":c:w:o:" opt; do
   case $opt in
     c) comment="$OPTARG"
+    ;;
+    o) other="$OPTARG"
+    ;;
+    w) max_width="$OPTARG"
     ;;
     \?) echo "Invalid option -$OPTARG" >&2
     ;;
@@ -17,21 +24,28 @@ done
 shift $((OPTIND-1))
 str=$@
 
-comment_sed=$(echo $comment | sed -e 's/./\\&/g; 1{$s/^$/""/}; 1!s/^/"/; $!s/$/"/')
-
+comment_sed=$(echo "$comment" | sed -e 's/./\\&/g; 1{$s/^$/""/}; 1!s/^/"/; $!s/$/"/')
 font=big
 if test -f $HOME/.local/share/figlet/starwars.flf; then
   font="starwars -d ~/.local/share/figlet"
 fi
 
-repl() { printf "$1"'%.s' $(eval "echo {1.."$(($2))"}"); }
+repl_aux() { printf "$1"'%.s' $(eval "echo {1.."$(($2))"}"); }
+repl() {
+  case $1 in
+    "%")
+    repl_aux "#" $2 | sed "s/#/%/g" ;;
+    *)
+    repl_aux "$1" $2;;
+  esac
+}
 
 cmd="figlet -t $str -f $font | sed -E \"s/^(.)/$comment_sed  \1/g\""
 
-size_comment=$(echo $comment | wc -L)
+size_comment=$(echo "$comment" | wc -L)
 size=$(bash -c "$cmd" | wc -L)
 
-if (( $size > 80 )) ; then
+if (( $size > $max_width )) ; then
   font=big
   cmd="figlet -t $str -f $font | sed -E \"s/^(.)/$comment_sed  \1/g\""
   size=$(bash -c "$cmd" | wc -L)
@@ -41,12 +55,13 @@ size_rep=$(($size / $size_comment))
 size_rep=$((size_rep - 1))
 
 echo -n "$comment "
-repl $comment $size_rep
+repl "$other" $size_rep
+
+echo -e "$other"
 echo -e "$comment"
-echo -e       "$comment"
 bash -c "$cmd"
 echo "$comment"
 echo "$comment  $str"
 echo -n "$comment "
-repl $comment $size_rep
+repl "$other" $size_rep
 echo

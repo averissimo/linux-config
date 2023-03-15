@@ -2,4 +2,4 @@ if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
   source /etc/profile.d/vte-2.91.sh
 fi
 
-alias myupdate="sudo apt autoclean && sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && sudo apt autoclean"
+alias myupdate="sudo apt autoclean && sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && sudo apt autoclean && flatpak update -y && flatpak update --user -y"

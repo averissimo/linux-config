@@ -312,6 +312,7 @@ clone_url() {
   if [ -d $(pwd)/$2 ]; then
     pushd . > /dev/null
     cd $(pwd)/$2
+    git checkout HEAD --force
     git pull
     popd > /dev/null
   else
@@ -362,6 +363,8 @@ extensions_install() {
   show_art "dash-to-dock"
   pushd . > /dev/null
   cd $GNOME_DIR/dash-to-dock
+  git pull --unshallow
+  git checkout ubuntu-dock
   make
   make install
   popd > /dev/null
@@ -395,9 +398,14 @@ extensions_install() {
   sudo apt install -y -q meson
   pushd . > /dev/null
   cd $GNOME_DIR/extension-pack
-  meson builddir -Dprefix=$HOME/.local
-  cd builddir
-  ninja install
+  git checkout gnome-41
+  bash ./export-zips.sh
+  for f in zip-files/*; do
+    gnome-extensions install $f -f
+  done
+  #meson builddir -Dprefix=$HOME/.local
+  #cd builddir
+  #ninja install
   popd > /dev/null
 
 
